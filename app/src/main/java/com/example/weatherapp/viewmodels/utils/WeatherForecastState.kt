@@ -1,4 +1,4 @@
-package com.example.weatherapp.viewmodels
+package com.example.weatherapp.viewmodels.utils
 
 import com.example.weatherapp.data.model.WeatherForecast
 
