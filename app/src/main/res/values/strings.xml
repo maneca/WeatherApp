@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">WeatherApp</string>
+    <string name="base_url">https://api.open-meteo.com/</string>
 </resources>
