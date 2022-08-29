@@ -1,7 +1,6 @@
 package com.example.weatherapp.viewmodels
 
 import androidx.lifecycle.viewModelScope
-import com.example.weatherapp.DisposableViewModel
 import com.example.weatherapp.domain.repository.WeatherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.schedulers.Schedulers

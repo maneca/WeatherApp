@@ -1,4 +1,4 @@
-package com.example.weatherapp
+package com.example.weatherapp.viewmodels
 
 import androidx.lifecycle.ViewModel
 import io.reactivex.rxjava3.annotations.NonNull
