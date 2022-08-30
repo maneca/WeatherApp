@@ -5,18 +5,22 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -25,6 +29,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.weatherapp.viewmodels.WeatherViewModel
 import com.example.weatherapp.viewmodels.models.HourlyForecastUI
+import com.example.weatherapp.widgets.Country
+import com.example.weatherapp.widgets.DropDownList
+import com.example.weatherapp.widgets.countries
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -58,6 +65,8 @@ class MainActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        CountrySelection(viewModel)
+                        Spacer(modifier = Modifier.height(16.dp))
                         state.value.forecast?.let {
                             Image(
                                 painter = painterResource(typeOfWeather(it.currentWeather.temperature)),
@@ -65,16 +74,6 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .size(100.dp, 100.dp)
                             )
-                            Text(
-                                text = "Berlin",
-                                Modifier.fillMaxWidth(),
-                                style = TextStyle(
-                                    fontSize = 38.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.Center
-                                )
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = "${it.currentWeather.temperature} ºC",
                                 Modifier.fillMaxWidth(),
@@ -127,6 +126,44 @@ class MainActivity : ComponentActivity() {
                     Text(text = "${item.temperature} ºC")
                 }
             }
+        }
+    }
+
+    @Composable
+    fun CountrySelection(viewModel: WeatherViewModel) {
+        val text = remember { mutableStateOf("") } // initial value
+        val isOpen = remember { mutableStateOf(false) } // initial value
+        val openCloseOfDropDownList: (Boolean) -> Unit = {
+            isOpen.value = it
+        }
+        val userSelectedString: (Country) -> Unit = {
+            text.value = it.name
+            viewModel.getWeatherForecast(it.latitude, it.longitude)
+        }
+        Box {
+            Column {
+                OutlinedTextField(
+                    value = text.value,
+                    onValueChange = { text.value = it },
+                    label = { Text(text = stringResource(id = R.string.select_country)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                DropDownList(
+                    requestToOpen = isOpen.value,
+                    list = countries,
+                    openCloseOfDropDownList,
+                    userSelectedString
+                )
+            }
+            Spacer(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(Color.Transparent)
+                    .padding(10.dp)
+                    .clickable(
+                        onClick = { isOpen.value = true }
+                    )
+            )
         }
     }
 

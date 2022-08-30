@@ -19,13 +19,12 @@ class WeatherViewModel @Inject constructor(
     private val _state = MutableStateFlow(WeatherForecastState())
     val state = _state.asStateFlow()
 
-    init {
-        getWeatherForecast()
-    }
-
-    private fun getWeatherForecast(){
+    fun getWeatherForecast(
+        latitude: Double,
+        longitude: Double
+    ){
         viewModelScope.launch(Dispatchers.IO) {
-            val response = repository.getWeatherForecast(41.53, -8.44, "temperature_2m")
+            val response = repository.getWeatherForecast(latitude, longitude)
             response.subscribeOn(Schedulers.io())
                 .subscribe(
                     { _state.value = state.value.copy(

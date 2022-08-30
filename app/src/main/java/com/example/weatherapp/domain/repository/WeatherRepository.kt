@@ -8,6 +8,6 @@ interface WeatherRepository {
     fun getWeatherForecast(
         latitude: Double,
         longitude: Double,
-        hourly: String)
+        hourly: String = "temperature_2m")
     : Single<WeatherForecast>
 }
