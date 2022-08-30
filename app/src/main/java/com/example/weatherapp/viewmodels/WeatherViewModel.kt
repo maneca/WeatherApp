@@ -2,7 +2,7 @@ package com.example.weatherapp.viewmodels
 
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.domain.repository.WeatherRepository
-import com.example.weatherapp.viewmodels.utils.WeatherForecastState
+import com.example.weatherapp.viewmodels.models.WeatherForecastState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +29,7 @@ class WeatherViewModel @Inject constructor(
             response.subscribeOn(Schedulers.io())
                 .subscribe(
                     { _state.value = state.value.copy(
-                        forecast = it,
+                        forecast = it.toWeatherForecastUI(),
                         error = ""
                     ) },
                     {_state.value = state.value.copy(
