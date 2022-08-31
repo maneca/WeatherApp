@@ -8,10 +8,11 @@ data class WeatherForecast(
     val currentWeather: CurrentWeather,
     val hourlyForecast: HourlyForecast
 ){
-    fun toWeatherForecastUI(): WeatherForecastUI{
+    fun toWeatherForecastUI(cityName: String): WeatherForecastUI{
         return WeatherForecastUI(
             currentWeather,
-            hourlyForecast.toHourlyForecastUI()
+            hourlyForecast.toHourlyForecastUI(),
+            cityName
         )
     }
 }

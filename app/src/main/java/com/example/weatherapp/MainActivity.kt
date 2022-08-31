@@ -1,15 +1,18 @@
 package com.example.weatherapp
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.weatherapp.viewmodels.WeatherViewModel
 import com.example.weatherapp.viewmodels.models.HourlyForecastUI
@@ -61,11 +65,37 @@ class MainActivity : ComponentActivity() {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
                             .padding(16.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        CountrySelection(viewModel)
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(Alignment.CenterVertically),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            LocationSelection(viewModel)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(
+                                onClick = { onClickCurrentLocation(viewModel) },
+                                Modifier.height(55.dp),
+                                contentPadding = PaddingValues(
+                                    start = 20.dp,
+                                    top = 12.dp,
+                                    end = 20.dp,
+                                    bottom = 12.dp
+                                )
+                            ) {
+                                Icon(
+                                    Icons.Filled.LocationOn,
+                                    contentDescription = "Current location",
+                                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                                )
+                            }
+                        }
                         Spacer(modifier = Modifier.height(16.dp))
                         state.value.forecast?.let {
                             Image(
@@ -73,6 +103,16 @@ class MainActivity : ComponentActivity() {
                                 "",
                                 modifier = Modifier
                                     .size(100.dp, 100.dp)
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Text(
+                                text = it.cityName,
+                                Modifier.fillMaxWidth(),
+                                style = TextStyle(
+                                    fontSize = 36.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center
+                                )
                             )
                             Text(
                                 text = "${it.currentWeather.temperature} ºC",
@@ -107,7 +147,8 @@ class MainActivity : ComponentActivity() {
                 Column(
                     Modifier.padding(4.dp),
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
                         text = item.hour, Modifier.fillMaxWidth(), style = TextStyle(
                             fontSize = 14.sp,
@@ -130,15 +171,14 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun CountrySelection(viewModel: WeatherViewModel) {
+    fun LocationSelection(viewModel: WeatherViewModel) {
         val text = remember { mutableStateOf("") } // initial value
         val isOpen = remember { mutableStateOf(false) } // initial value
         val openCloseOfDropDownList: (Boolean) -> Unit = {
             isOpen.value = it
         }
         val userSelectedString: (Country) -> Unit = {
-            text.value = it.name
-            viewModel.getWeatherForecast(it.latitude, it.longitude)
+            viewModel.getWeatherForecast(it.latitude, it.longitude, it.name)
         }
         Box {
             Column {
@@ -146,7 +186,7 @@ class MainActivity : ComponentActivity() {
                     value = text.value,
                     onValueChange = { text.value = it },
                     label = { Text(text = stringResource(id = R.string.select_country)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(0.8f)
                 )
                 DropDownList(
                     requestToOpen = isOpen.value,
@@ -159,11 +199,40 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier
                     .matchParentSize()
                     .background(Color.Transparent)
-                    .padding(10.dp)
+                    .padding(4.dp)
                     .clickable(
                         onClick = { isOpen.value = true }
                     )
             )
+        }
+    }
+
+    private fun onClickCurrentLocation(viewModel: WeatherViewModel) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestMultiplePermissions.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            )
+        } else {
+            viewModel.getCurrentLocation()
+        }
+    }
+
+    private val requestMultiplePermissions = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        permissions.entries.forEach {
+            // TODO
+            //viewModel.getCurrentLocation()
         }
     }
 

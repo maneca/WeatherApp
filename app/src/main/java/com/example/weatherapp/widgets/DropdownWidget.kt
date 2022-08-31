@@ -14,7 +14,7 @@ fun DropDownList(
     selectedString: (Country) -> Unit
 ) {
     DropdownMenu(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(0.8f),
         expanded = requestToOpen,
         onDismissRequest = { request(false) },
     ) {

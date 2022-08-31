@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">WeatherApp</string>
     <string name="base_url">https://api.open-meteo.com/</string>
-    <string name="select_country">Select country</string>
+    <string name="select_country">Select location</string>
 </resources>
