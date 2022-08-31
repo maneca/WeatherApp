@@ -49,6 +49,8 @@ class MainActivity : ComponentActivity() {
             val state = viewModel.state.collectAsState()
             val scaffoldState = rememberScaffoldState()
 
+            checkPermissions()
+
             Scaffold(
                 scaffoldState = scaffoldState
             ) {
@@ -80,7 +82,7 @@ class MainActivity : ComponentActivity() {
                             LocationSelection(viewModel)
                             Spacer(modifier = Modifier.height(8.dp))
                             Button(
-                                onClick = { onClickCurrentLocation(viewModel) },
+                                onClick = { viewModel.getCurrentLocation() },
                                 Modifier.height(55.dp),
                                 contentPadding = PaddingValues(
                                     start = 20.dp,
@@ -207,7 +209,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun onClickCurrentLocation(viewModel: WeatherViewModel) {
+    private fun checkPermissions() {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -222,8 +224,6 @@ class MainActivity : ComponentActivity() {
                     Manifest.permission.ACCESS_FINE_LOCATION
                 )
             )
-        } else {
-            viewModel.getCurrentLocation()
         }
     }
 
@@ -231,8 +231,7 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         permissions.entries.forEach {
-            // TODO
-            //viewModel.getCurrentLocation()
+
         }
     }
 
